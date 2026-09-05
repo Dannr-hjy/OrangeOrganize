@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  橙子课表 / OrangeOrganize - 官网 Logo
+  设计说明：橙色圆角背景 + 三条白色横线（象征课表行列）
+  主色：#9A4800（暖橙）
+  线条色：#FFFFFF（纯白）
+  圆角：16px
+-->
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- 橙色圆角矩形背景 -->
+  <rect x="24" y="24" width="464" height="464" rx="76" fill="#9A4800"/>
+
+  <!-- 第一条横线（完整） -->
+  <rect x="118" y="112" width="276" height="40" rx="20" fill="#FFFFFF"/>
+
+  <!-- 第二条横线（完整） -->
+  <rect x="118" y="236" width="276" height="40" rx="20" fill="#FFFFFF"/>
+
+  <!-- 第三条横线（较短，左侧对齐） -->
+  <rect x="118" y="360" width="164" height="40" rx="20" fill="#FFFFFF"/>
+</svg>
