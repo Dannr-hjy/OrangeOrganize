@@ -61,12 +61,75 @@
         }
 
         /* ========================================
+           深色模式设计令牌
+           ======================================== */
+        :root[data-theme="dark"] {
+            /* 品牌色（暗色下提亮以保持对比度） */
+            --color-primary: #FFB77C;              /* 亮橙主色 */
+            --color-accent: #FF8A45;               /* 强调橙 */
+            --color-accent-hover: #FFA169;         /* 强调橙悬停 */
+            --color-primary-container: #5C3A1E;    /* 深褐容器底 */
+
+            /* 背景色 */
+            --color-bg: #1A1410;                   /* 深褐黑背景 */
+            --color-surface: #241C16;              /* 卡片深底 */
+            --color-surface-variant: #2D231B;      /* 辅助卡片深底 */
+
+            /* 文字色 */
+            --color-text: #F5EDE6;                 /* 正文文字 */
+            --color-text-secondary: #C3B2A3;       /* 次要文字 */
+            --color-on-primary-container: #FFDBC6; /* 容器内文字 */
+
+            /* 装饰色 */
+            --color-divider: #3D3128;              /* 分割线 */
+
+            /* 阴影 */
+            --color-shadow-soft: rgba(0, 0, 0, 0.3);
+            --color-shadow-medium: rgba(0, 0, 0, 0.4);
+            --color-shadow-strong: rgba(0, 0, 0, 0.5);
+        }
+
+        :root[data-theme="dark"] body {
+            color-scheme: dark;
+        }
+
+        /* 深色模式下需要特殊处理的硬编码颜色 */
+        :root[data-theme="dark"] .download-subtitle {
+            color: rgba(255, 219, 198, 0.7);
+        }
+
+        :root[data-theme="dark"] .download-notice {
+            color: rgba(255, 219, 198, 0.65);
+        }
+
+        :root[data-theme="dark"] .footer-trust {
+            background-color: #24321F;
+            color: #A5D6A7;
+        }
+
+        :root[data-theme="dark"] .download::before {
+            background-color: rgba(255, 183, 122, 0.06);
+        }
+
+        :root[data-theme="dark"] .download::after {
+            background-color: rgba(255, 138, 69, 0.08);
+        }
+
+        /* ========================================
            基础重置
            ======================================== */
         *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+        }
+
+        html {
+            color-scheme: light;
+        }
+
+        html[data-theme="dark"] {
+            color-scheme: dark;
         }
 
         html {
@@ -81,6 +144,14 @@
             background-color: var(--color-bg);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* 主题切换时的平滑过渡 */
+        body.theme-transitioning,
+        body.theme-transitioning *,
+        body.theme-transitioning *::before,
+        body.theme-transitioning *::after {
+            transition: background-color 300ms ease, color 300ms ease, border-color 300ms ease !important;
         }
 
         a {
@@ -213,6 +284,13 @@
             gap: 8px;
         }
 
+        /* 导航栏右侧操作区（主题切换 + 汉堡菜单） */
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .nav-link {
             padding: 10px 16px;
             border-radius: var(--radius-button-md);
@@ -245,6 +323,47 @@
             background-color: var(--color-primary);
             border-radius: 2px;
             transition: var(--transition-fast);
+        }
+
+        /* 主题切换按钮 */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: none;
+            border: 1px solid var(--color-divider);
+            border-radius: 50%;
+            color: var(--color-primary);
+            cursor: pointer;
+            transition: background-color var(--transition-fast), transform var(--transition-fast);
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--color-primary-container);
+        }
+
+        .theme-toggle:active {
+            transform: scale(0.92);
+        }
+
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* 根据主题显示对应图标：浅色显示月亮，深色显示太阳 */
+        .theme-toggle .icon-sun {
+            display: none;
+        }
+
+        html[data-theme="dark"] .theme-toggle .icon-sun {
+            display: block;
+        }
+
+        html[data-theme="dark"] .theme-toggle .icon-moon {
+            display: none;
         }
 
         /* 移动端导航菜单 */
@@ -880,6 +999,18 @@
             }
         }
     </style>
+
+    <!-- 尽早应用主题，避免深色模式下刷新时闪白 -->
+    <script>
+        (function() {
+            var stored = null;
+            try { stored = localStorage.getItem('theme'); } catch (e) {}
+            var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
 </head>
 <body>
     <!-- ========================================
@@ -893,16 +1024,27 @@
                 橙子课表
             </a>
 
-            <button class="hamburger" id="hamburger" aria-label="打开菜单">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-
             <div class="navbar-nav">
                 <a href="#features" class="nav-link">特性</a>
                 <a href="#download" class="nav-link">下载</a>
                 <a href="#faq" class="nav-link">FAQ</a>
+            </div>
+
+            <div class="navbar-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="切换深色模式">
+                    <svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12.34 2.02C6.59 1.82 2 6.34 2 12c0 5.52 4.48 10 10 10 3.87 0 7.21-2.35 8.66-5.68-5.08.74-9.9-2.96-9.9-8.13 0-2.58 1.21-4.87 3.1-6.37-.5-.23-1.03-.4-1.52-.8zM4 12c0-4.14 3.14-7.65 7.23-7.98C9.86 5.68 9 7.36 9 9.19c0 4.32 4.1 7.65 8.55 6.6A8.003 8.003 0 0 1 4 12z"/>
+                    </svg>
+                    <svg class="icon-sun" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm2-12h-4a.5.5 0 0 1-.5-.5.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5.5.5 0 0 1-.5.5zm0 15h-4a.5.5 0 0 1-.5-.5.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5.5.5 0 0 1-.5.5zM6.05 6.55a.5.5 0 0 1-.35-.15l-2.83-2.83a.5.5 0 0 1 0-.71.5.5 0 0 1 .71 0l2.83 2.83a.5.5 0 0 1 0 .71.5.5 0 0 1-.36.15zm14.14 14.14a.5.5 0 0 1-.35-.15l-2.83-2.83a.5.5 0 0 1 0-.71.5.5 0 0 1 .71 0l2.83 2.83a.5.5 0 0 1 0 .71.5.5 0 0 1-.36.15zM12 5a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5zm0 24a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5zM3.05 12H3a.5.5 0 0 1-.5-.5.5.5 0 0 1 .5-.5h.05a.5.5 0 0 1 .5.5.5.5 0 0 1-.5.5zm18.9 0h-.05a.5.5 0 0 1-.5-.5.5.5 0 0 1 .5-.5h.05a.5.5 0 0 1 .5.5.5.5 0 0 1-.5.5zM4.87 20.64a.5.5 0 0 1-.35-.15.5.5 0 0 1 0-.71l2.83-2.83a.5.5 0 0 1 .71 0 .5.5 0 0 1 0 .71l-2.83 2.83a.5.5 0 0 1-.36.15zm14.14-14.14a.5.5 0 0 1-.35-.15.5.5 0 0 1 0-.71l2.83-2.83a.5.5 0 0 1 .71 0 .5.5 0 0 1 0 .71l-2.83 2.83a.5.5 0 0 1-.36.15z"/>
+                    </svg>
+                </button>
+
+                <button class="hamburger" id="hamburger" aria-label="打开菜单">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </div>
         </div>
     </nav>
@@ -1198,6 +1340,31 @@
             const faqItems = document.querySelectorAll('.faq-item');
             const faqQuestions = document.querySelectorAll('.faq-question');
             const fadeElements = document.querySelectorAll('.fade-in');
+            const themeToggle = document.getElementById('themeToggle');
+
+            /* ---------- 深色模式切换 ---------- */
+            function applyTheme(theme, animate) {
+                if (animate) {
+                    document.body.classList.add('theme-transitioning');
+                }
+                if (theme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                }
+                themeToggle.setAttribute('aria-label', theme === 'dark' ? '切换浅色模式' : '切换深色模式');
+                try { localStorage.setItem('theme', theme); } catch (e) {}
+                if (animate) {
+                    window.setTimeout(function() {
+                        document.body.classList.remove('theme-transitioning');
+                    }, 300);
+                }
+            }
+
+            themeToggle.addEventListener('click', function() {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                applyTheme(isDark ? 'light' : 'dark', true);
+            });
 
             /* ---------- 导航栏吸顶阴影 ---------- */
             window.addEventListener('scroll', function() {
