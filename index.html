@@ -353,16 +353,25 @@
             height: 20px;
         }
 
-        /* 根据主题显示对应图标：浅色显示月亮，深色显示太阳 */
-        .theme-toggle .icon-sun {
+        /* 根据主题模式显示对应图标：浅色显示月亮，深色显示太阳，跟随系统显示自动图标 */
+        .theme-toggle .icon-sun,
+        .theme-toggle .icon-auto {
             display: none;
         }
 
-        html[data-theme="dark"] .theme-toggle .icon-sun {
+        html[data-theme-mode="dark"] .theme-toggle .icon-sun {
             display: block;
         }
 
-        html[data-theme="dark"] .theme-toggle .icon-moon {
+        html[data-theme-mode="dark"] .theme-toggle .icon-moon {
+            display: none;
+        }
+
+        html[data-theme-mode="system"] .theme-toggle .icon-auto {
+            display: block;
+        }
+
+        html[data-theme-mode="system"] .theme-toggle .icon-moon {
             display: none;
         }
 
@@ -1003,10 +1012,11 @@
     <!-- 尽早应用主题，避免深色模式下刷新时闪白 -->
     <script>
         (function() {
-            var stored = null;
-            try { stored = localStorage.getItem('theme'); } catch (e) {}
-            var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            if (theme === 'dark') {
+            var mode = null;
+            try { mode = localStorage.getItem('themeMode'); } catch (e) {}
+            var dark = mode === 'dark' || (mode !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.setAttribute('data-theme-mode', mode || 'system');
+            if (dark) {
                 document.documentElement.setAttribute('data-theme', 'dark');
             }
         })();
@@ -1031,9 +1041,13 @@
             </div>
 
             <div class="navbar-actions">
-                <button class="theme-toggle" id="themeToggle" aria-label="切换深色模式">
+                <button class="theme-toggle" id="themeToggle" aria-label="切换主题模式" title="切换主题模式">
                     <svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12.34 2.02C6.59 1.82 2 6.34 2 12c0 5.52 4.48 10 10 10 3.87 0 7.21-2.35 8.66-5.68-5.08.74-9.9-2.96-9.9-8.13 0-2.58 1.21-4.87 3.1-6.37-.5-.23-1.03-.4-1.52-.8zM4 12c0-4.14 3.14-7.65 7.23-7.98C9.86 5.68 9 7.36 9 9.19c0 4.32 4.1 7.65 8.55 6.6A8.003 8.003 0 0 1 4 12z"/>
+                    </svg>
+                    <svg class="icon-auto" viewBox="0 0 24 24" fill="currentColor">
+                        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 3a9 9 0 0 1 0 18z"/>
                     </svg>
                     <svg class="icon-sun" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm2-12h-4a.5.5 0 0 1-.5-.5.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5.5.5 0 0 1-.5.5zm0 15h-4a.5.5 0 0 1-.5-.5.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5.5.5 0 0 1-.5.5zM6.05 6.55a.5.5 0 0 1-.35-.15l-2.83-2.83a.5.5 0 0 1 0-.71.5.5 0 0 1 .71 0l2.83 2.83a.5.5 0 0 1 0 .71.5.5 0 0 1-.36.15zm14.14 14.14a.5.5 0 0 1-.35-.15l-2.83-2.83a.5.5 0 0 1 0-.71.5.5 0 0 1 .71 0l2.83 2.83a.5.5 0 0 1 0 .71.5.5 0 0 1-.36.15zM12 5a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5zm0 24a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5zM3.05 12H3a.5.5 0 0 1-.5-.5.5.5 0 0 1 .5-.5h.05a.5.5 0 0 1 .5.5.5.5 0 0 1-.5.5zm18.9 0h-.05a.5.5 0 0 1-.5-.5.5.5 0 0 1 .5-.5h.05a.5.5 0 0 1 .5.5.5.5 0 0 1-.5.5zM4.87 20.64a.5.5 0 0 1-.35-.15.5.5 0 0 1 0-.71l2.83-2.83a.5.5 0 0 1 .71 0 .5.5 0 0 1 0 .71l-2.83 2.83a.5.5 0 0 1-.36.15zm14.14-14.14a.5.5 0 0 1-.35-.15.5.5 0 0 1 0-.71l2.83-2.83a.5.5 0 0 1 .71 0 .5.5 0 0 1 0 .71l-2.83 2.83a.5.5 0 0 1-.36.15z"/>
@@ -1174,12 +1188,12 @@
                 <h2 class="download-title">立即下载橙子课表</h2>
                 <p class="download-subtitle">轻松管理你的每一节课</p>
 
-                <!-- 下载按钮：href 占位，请替换为真实 APK 下载链接，例如 "downloads/orange-organize-v1.0.0.apk" -->
-                <a href="downloads/orange-organize-v1.0.0.apk" class="btn btn-primary download-button">
+                <!-- 下载按钮：href 占位，请替换为真实 APK 下载链接，例如 "downloads/orange-organize-v1.4.0.apk" -->
+                <a href="downloads/orange-organize-v1.4.0.apk" class="btn btn-primary download-button">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
                     </svg>
-                    下载橙子课表 v1.0.0
+                    下载橙子课表 v1.4.0
                 </a>
                 <br>
                 <!-- 下载信息：版本 / 大小 / 系统要求 / 更新日期 -->
@@ -1342,18 +1356,22 @@
             const fadeElements = document.querySelectorAll('.fade-in');
             const themeToggle = document.getElementById('themeToggle');
 
-            /* ---------- 深色模式切换 ---------- */
-            function applyTheme(theme, animate) {
+            /* ---------- 主题模式切换：跟随系统 → 浅色 → 深色 ---------- */
+            function applyTheme(mode, animate) {
                 if (animate) {
                     document.body.classList.add('theme-transitioning');
                 }
-                if (theme === 'dark') {
+                var dark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                document.documentElement.setAttribute('data-theme-mode', mode);
+                if (dark) {
                     document.documentElement.setAttribute('data-theme', 'dark');
                 } else {
                     document.documentElement.removeAttribute('data-theme');
                 }
-                themeToggle.setAttribute('aria-label', theme === 'dark' ? '切换浅色模式' : '切换深色模式');
-                try { localStorage.setItem('theme', theme); } catch (e) {}
+                var labels = { system: '跟随系统', light: '浅色模式', dark: '深色模式' };
+                themeToggle.setAttribute('aria-label', '当前：' + labels[mode] + '，点击切换主题');
+                themeToggle.setAttribute('title', '当前：' + labels[mode] + '，点击切换主题');
+                try { localStorage.setItem('themeMode', mode); } catch (e) {}
                 if (animate) {
                     window.setTimeout(function() {
                         document.body.classList.remove('theme-transitioning');
@@ -1361,9 +1379,23 @@
                 }
             }
 
+            function storedMode() {
+                try { return localStorage.getItem('themeMode') || 'system'; } catch (e) { return 'system'; }
+            }
+
+            applyTheme(storedMode(), false);
+
             themeToggle.addEventListener('click', function() {
-                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-                applyTheme(isDark ? 'light' : 'dark', true);
+                var current = document.documentElement.getAttribute('data-theme-mode') || 'system';
+                var next = current === 'system' ? 'light' : (current === 'light' ? 'dark' : 'system');
+                applyTheme(next, true);
+            });
+
+            /* 跟随系统模式下，系统主题变化时实时切换 */
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+                if (storedMode() === 'system') {
+                    applyTheme('system', true);
+                }
             });
 
             /* ---------- 导航栏吸顶阴影 ---------- */
